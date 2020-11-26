@@ -1631,7 +1631,6 @@ const char* ImStristr(const char* haystack, const char* haystack_end, const char
 
 const char* ImStrstr(ImStrv haystack, ImStrv needle)
 {
-    IM_IMSTR_ENSURE_HAS_END(needle);
     const char un0 = (char)*needle.Begin;
     while ((!haystack.End && *haystack.Begin) || (haystack.End && haystack.Begin < haystack.End))
     {
@@ -2360,8 +2359,7 @@ bool ImGuiTextFilter::PassFilter(ImStrv text) const
     if (Filters.empty())
         return true;
 
-    IM_IMSTR_ENSURE_HAS_END(text);
-    if (text.Empty())
+    if (text.Empty()) // FIXME-IMSTR
         text.Begin = text.End = "";
 
     for (int i = 0; i != Filters.Size; i++)
@@ -3030,14 +3028,9 @@ void ImGui::RenderText(ImVec2 pos, ImStrv text, bool hide_text_after_hash)
     // Hide anything after a '##' string
     const char* text_display_end;
     if (hide_text_after_hash)
-    {
         text_display_end = FindRenderedTextEnd(text);
-    }
     else
-    {
-        IM_IMSTR_ENSURE_HAS_END(text);
         text_display_end = text.End;
-    }
 
     if (text.Begin != text_display_end)
     {
@@ -3051,7 +3044,6 @@ void ImGui::RenderTextWrapped(ImVec2 pos, ImStrv text, float wrap_width)
 {
     ImGuiContext& g = *GImGui;
     ImGuiWindow* window = g.CurrentWindow;
-    IM_IMSTR_ENSURE_HAS_END(text);
 
     if (text.Begin != text.End)
     {
@@ -3285,7 +3277,6 @@ ImGuiID ImGuiWindow::GetID(ImStrv str)
     ImGuiID id = ImHashStr(str, seed);
     ImGui::KeepAliveID(id);
     ImGuiContext& g = *GImGui;
-    IM_IMSTR_ENSURE_HAS_END(str);
     if (g.DebugHookIdInfo == id)
         ImGui::DebugHookIdInfo(id, ImGuiDataType_String, str.Begin, str.End);
     return id;
@@ -3316,8 +3307,7 @@ ImGuiID ImGuiWindow::GetID(int n)
 ImGuiID ImGuiWindow::GetIDNoKeepAlive(ImStrv str)
 {
     ImGuiID seed = IDStack.back();
-    IM_IMSTR_ENSURE_HAS_END(str);
-    ImGuiID id = ImHashStr(str.Begin, str.End - str.Begin, seed);
+    ImGuiID id = ImHashStr(str, seed);
     ImGuiContext& g = *GImGui;
     if (g.DebugHookIdInfo == id)
         ImGui::DebugHookIdInfo(id, ImGuiDataType_String, str.Begin, str.End);
@@ -4979,7 +4969,6 @@ ImVec2 ImGui::CalcTextSize(ImStrv text, bool hide_text_after_double_hash, float 
 {
     ImGuiContext& g = *GImGui;
 
-    IM_IMSTR_ENSURE_HAS_END(text);
     if (hide_text_after_double_hash)
         text.End = FindRenderedTextEnd(text);      // Hide anything after a '##' string
 
