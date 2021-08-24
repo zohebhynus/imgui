@@ -377,7 +377,7 @@ void ImGui::StyleColorsLight(ImGuiStyle* dst)
 // [SECTION] ImFontAtlasShadowTexConfig
 //-----------------------------------------------------------------------------
 
-ImFontAtlasShadowTexConfig::ImFontAtlasShadowTexConfig()
+void ImFontAtlasShadowTexConfig::SetupDefaults()
 {
     TexCornerSize = 16;
     TexEdgeSize = 1;
@@ -2725,6 +2725,7 @@ ImFontAtlas::ImFontAtlas()
     TexGlyphPadding = 1;
     PackIdMouseCursors = PackIdLines = -1;
     ShadowRectIds[0] = ShadowRectIds[1] = -1;
+    ShadowTexConfig.SetupDefaults();
 }
 
 ImFontAtlas::~ImFontAtlas()
